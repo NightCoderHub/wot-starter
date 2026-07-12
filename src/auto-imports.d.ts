@@ -15,6 +15,10 @@ declare global {
   const apiDefinitions: typeof import('./api/apiDefinitions')['default']
   const asyncComputed: typeof import('@vueuse/core')['asyncComputed']
   const autoResetRef: typeof import('@vueuse/core')['autoResetRef']
+  const base64Decode: typeof import('./utils/tools/index')['base64Decode']
+  const base64Encode: typeof import('./utils/tools/index')['base64Encode']
+  const capitalize: typeof import('./utils/formatter/index')['capitalize']
+  const clearStorageSync: typeof import('./utils/storage/index')['clearStorageSync']
   const computed: typeof import('vue')['computed']
   const computedAsync: typeof import('@vueuse/core')['computedAsync']
   const computedEager: typeof import('@vueuse/core')['computedEager']
@@ -35,27 +39,51 @@ declare global {
   const createTemplatePromise: typeof import('@vueuse/core')['createTemplatePromise']
   const createUnrefFn: typeof import('@vueuse/core')['createUnrefFn']
   const customRef: typeof import('vue')['customRef']
+  const debounce: typeof import('./utils/tools/index')['debounce']
   const debouncedRef: typeof import('@vueuse/core')['debouncedRef']
   const debouncedWatch: typeof import('@vueuse/core')['debouncedWatch']
+  const deepClone: typeof import('./utils/tools/index')['deepClone']
   const defineAsyncComponent: typeof import('vue')['defineAsyncComponent']
   const defineComponent: typeof import('vue')['defineComponent']
   const defineStore: typeof import('pinia')['defineStore']
+  const del: typeof import('./utils/request/index')['del']
+  const downloadFile: typeof import('./utils/tools/index')['downloadFile']
   const eagerComputed: typeof import('@vueuse/core')['eagerComputed']
   const effectScope: typeof import('vue')['effectScope']
   const extendRef: typeof import('@vueuse/core')['extendRef']
+  const formatFileSize: typeof import('./utils/formatter/index')['formatFileSize']
+  const formatMoney: typeof import('./utils/formatter/index')['formatMoney']
+  const formatMoneyChinese: typeof import('./utils/formatter/index')['formatMoneyChinese']
+  const formatRelativeTime: typeof import('./utils/formatter/index')['formatRelativeTime']
+  const formatTime: typeof import('./utils/formatter/index')['formatTime']
+  const generateId: typeof import('./utils/tools/index')['generateId']
+  const generateUUID: typeof import('./utils/tools/index')['generateUUID']
+  const get: typeof import('./utils/request/index')['get']
   const getActivePinia: typeof import('pinia')['getActivePinia']
+  const getClipboardData: typeof import('./utils/platform/index')['getClipboardData']
   const getCurrentInstance: typeof import('vue')['getCurrentInstance']
   const getCurrentPath: typeof import('./utils/index')['getCurrentPath']
   const getCurrentScope: typeof import('vue')['getCurrentScope']
+  const getNavBarHeight: typeof import('./utils/platform/index')['getNavBarHeight']
+  const getPlatform: typeof import('./utils/platform/index')['getPlatform']
+  const getStatusBarHeight: typeof import('./utils/platform/index')['getStatusBarHeight']
+  const getStorageInfoSync: typeof import('./utils/storage/index')['getStorageInfoSync']
+  const getStorageSync: typeof import('./utils/storage/index')['getStorageSync']
+  const getStorageWithExpire: typeof import('./utils/storage/index')['getStorageWithExpire']
+  const getSystemInfo: typeof import('./utils/platform/index')['getSystemInfo']
   const h: typeof import('vue')['h']
   const ignorableWatch: typeof import('@vueuse/core')['ignorableWatch']
   const inject: typeof import('vue')['inject']
   const injectLocal: typeof import('@vueuse/core')['injectLocal']
+  const isApp: typeof import('./utils/platform/index')['isApp']
   const isDefined: typeof import('@vueuse/core')['isDefined']
+  const isEmpty: typeof import('./utils/tools/index')['isEmpty']
+  const isH5: typeof import('./utils/platform/index')['isH5']
   const isProxy: typeof import('vue')['isProxy']
   const isReactive: typeof import('vue')['isReactive']
   const isReadonly: typeof import('vue')['isReadonly']
   const isRef: typeof import('vue')['isRef']
+  const isWeixin: typeof import('./utils/platform/index')['isWeixin']
   const makeDestructurable: typeof import('@vueuse/core')['makeDestructurable']
   const mapActions: typeof import('pinia')['mapActions']
   const mapGetters: typeof import('pinia')['mapGetters']
@@ -63,6 +91,9 @@ declare global {
   const mapStores: typeof import('pinia')['mapStores']
   const mapWritableState: typeof import('pinia')['mapWritableState']
   const markRaw: typeof import('vue')['markRaw']
+  const maskIdCard: typeof import('./utils/formatter/index')['maskIdCard']
+  const maskName: typeof import('./utils/formatter/index')['maskName']
+  const maskPhone: typeof import('./utils/formatter/index')['maskPhone']
   const mountApis: typeof import('./api/createApis')['mountApis']
   const nextTick: typeof import('vue')['nextTick']
   const onActivated: typeof import('vue')['onActivated']
@@ -108,8 +139,12 @@ declare global {
   const onUpdated: typeof import('vue')['onUpdated']
   const pausableWatch: typeof import('@vueuse/core')['pausableWatch']
   const persistPlugin: typeof import('./store/persist')['persistPlugin']
+  const post: typeof import('./utils/request/index')['post']
   const provide: typeof import('vue')['provide']
   const provideLocal: typeof import('@vueuse/core')['provideLocal']
+  const put: typeof import('./utils/request/index')['put']
+  const randomInt: typeof import('./utils/tools/index')['randomInt']
+  const randomPick: typeof import('./utils/tools/index')['randomPick']
   const reactify: typeof import('@vueuse/core')['reactify']
   const reactifyObject: typeof import('@vueuse/core')['reactifyObject']
   const reactive: typeof import('vue')['reactive']
@@ -123,19 +158,29 @@ declare global {
   const refDefault: typeof import('@vueuse/core')['refDefault']
   const refThrottled: typeof import('@vueuse/core')['refThrottled']
   const refWithControl: typeof import('@vueuse/core')['refWithControl']
+  const removeStorageSync: typeof import('./utils/storage/index')['removeStorageSync']
+  const request: typeof import('./utils/request/index')['request']
   const resolveComponent: typeof import('vue')['resolveComponent']
   const resolveRef: typeof import('@vueuse/core')['resolveRef']
   const resolveUnref: typeof import('@vueuse/core')['resolveUnref']
   const setActivePinia: typeof import('pinia')['setActivePinia']
+  const setBaseURL: typeof import('./utils/request/index')['setBaseURL']
+  const setClipboardData: typeof import('./utils/platform/index')['setClipboardData']
   const setMapStoreSuffix: typeof import('pinia')['setMapStoreSuffix']
+  const setStorageSync: typeof import('./utils/storage/index')['setStorageSync']
+  const setStorageWithExpire: typeof import('./utils/storage/index')['setStorageWithExpire']
   const shallowReactive: typeof import('vue')['shallowReactive']
   const shallowReadonly: typeof import('vue')['shallowReadonly']
   const shallowRef: typeof import('vue')['shallowRef']
+  const shuffleArray: typeof import('./utils/tools/index')['shuffleArray']
+  const simpleHash: typeof import('./utils/tools/index')['simpleHash']
+  const sleep: typeof import('./utils/tools/index')['sleep']
   const storeToRefs: typeof import('pinia')['storeToRefs']
   const syncRef: typeof import('@vueuse/core')['syncRef']
   const syncRefs: typeof import('@vueuse/core')['syncRefs']
   const templateRef: typeof import('@vueuse/core')['templateRef']
   const themeColorOptions: typeof import('./composables/useManualTheme')['themeColorOptions']
+  const throttle: typeof import('./utils/tools/index')['throttle']
   const throttledRef: typeof import('@vueuse/core')['throttledRef']
   const throttledWatch: typeof import('@vueuse/core')['throttledWatch']
   const toRaw: typeof import('vue')['toRaw']
@@ -144,11 +189,15 @@ declare global {
   const toRefs: typeof import('vue')['toRefs']
   const toValue: typeof import('vue')['toValue']
   const triggerRef: typeof import('vue')['triggerRef']
+  const trim: typeof import('./utils/formatter/index')['trim']
+  const truncate: typeof import('./utils/formatter/index')['truncate']
   const tryOnBeforeMount: typeof import('@vueuse/core')['tryOnBeforeMount']
   const tryOnBeforeUnmount: typeof import('@vueuse/core')['tryOnBeforeUnmount']
   const tryOnMounted: typeof import('@vueuse/core')['tryOnMounted']
   const tryOnScopeDispose: typeof import('@vueuse/core')['tryOnScopeDispose']
   const tryOnUnmounted: typeof import('@vueuse/core')['tryOnUnmounted']
+  const uniqueArray: typeof import('./utils/tools/index')['uniqueArray']
+  const uniqueArrayByKey: typeof import('./utils/tools/index')['uniqueArrayByKey']
   const unref: typeof import('vue')['unref']
   const unrefElement: typeof import('@vueuse/core')['unrefElement']
   const until: typeof import('@vueuse/core')['until']
@@ -327,6 +376,18 @@ declare global {
   const useWindowFocus: typeof import('@vueuse/core')['useWindowFocus']
   const useWindowScroll: typeof import('@vueuse/core')['useWindowScroll']
   const useWindowSize: typeof import('@vueuse/core')['useWindowSize']
+  const validateAmount: typeof import('./utils/validator/index')['validateAmount']
+  const validateBankCard: typeof import('./utils/validator/index')['validateBankCard']
+  const validateChineseName: typeof import('./utils/validator/index')['validateChineseName']
+  const validateEmail: typeof import('./utils/validator/index')['validateEmail']
+  const validateIdCard: typeof import('./utils/validator/index')['validateIdCard']
+  const validateNumber: typeof import('./utils/validator/index')['validateNumber']
+  const validatePassword: typeof import('./utils/validator/index')['validatePassword']
+  const validatePhone: typeof import('./utils/validator/index')['validatePhone']
+  const validatePlateNumber: typeof import('./utils/validator/index')['validatePlateNumber']
+  const validatePositiveInt: typeof import('./utils/validator/index')['validatePositiveInt']
+  const validatePostalCode: typeof import('./utils/validator/index')['validatePostalCode']
+  const validateUrl: typeof import('./utils/validator/index')['validateUrl']
   const watch: typeof import('vue')['watch']
   const watchArray: typeof import('@vueuse/core')['watchArray']
   const watchAtMost: typeof import('@vueuse/core')['watchAtMost']
@@ -366,6 +427,10 @@ declare module 'vue' {
     readonly apiDefinitions: UnwrapRef<typeof import('./api/apiDefinitions')['default']>
     readonly asyncComputed: UnwrapRef<typeof import('@vueuse/core')['asyncComputed']>
     readonly autoResetRef: UnwrapRef<typeof import('@vueuse/core')['autoResetRef']>
+    readonly base64Decode: UnwrapRef<typeof import('./utils/tools/index')['base64Decode']>
+    readonly base64Encode: UnwrapRef<typeof import('./utils/tools/index')['base64Encode']>
+    readonly capitalize: UnwrapRef<typeof import('./utils/formatter/index')['capitalize']>
+    readonly clearStorageSync: UnwrapRef<typeof import('./utils/storage/index')['clearStorageSync']>
     readonly computed: UnwrapRef<typeof import('vue')['computed']>
     readonly computedAsync: UnwrapRef<typeof import('@vueuse/core')['computedAsync']>
     readonly computedEager: UnwrapRef<typeof import('@vueuse/core')['computedEager']>
@@ -386,27 +451,49 @@ declare module 'vue' {
     readonly createTemplatePromise: UnwrapRef<typeof import('@vueuse/core')['createTemplatePromise']>
     readonly createUnrefFn: UnwrapRef<typeof import('@vueuse/core')['createUnrefFn']>
     readonly customRef: UnwrapRef<typeof import('vue')['customRef']>
+    readonly debounce: UnwrapRef<typeof import('./utils/tools/index')['debounce']>
     readonly debouncedRef: UnwrapRef<typeof import('@vueuse/core')['debouncedRef']>
     readonly debouncedWatch: UnwrapRef<typeof import('@vueuse/core')['debouncedWatch']>
+    readonly deepClone: UnwrapRef<typeof import('./utils/tools/index')['deepClone']>
     readonly defineAsyncComponent: UnwrapRef<typeof import('vue')['defineAsyncComponent']>
     readonly defineComponent: UnwrapRef<typeof import('vue')['defineComponent']>
     readonly defineStore: UnwrapRef<typeof import('pinia')['defineStore']>
+    readonly downloadFile: UnwrapRef<typeof import('./utils/tools/index')['downloadFile']>
     readonly eagerComputed: UnwrapRef<typeof import('@vueuse/core')['eagerComputed']>
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
     readonly extendRef: UnwrapRef<typeof import('@vueuse/core')['extendRef']>
+    readonly formatFileSize: UnwrapRef<typeof import('./utils/formatter/index')['formatFileSize']>
+    readonly formatMoney: UnwrapRef<typeof import('./utils/formatter/index')['formatMoney']>
+    readonly formatMoneyChinese: UnwrapRef<typeof import('./utils/formatter/index')['formatMoneyChinese']>
+    readonly formatRelativeTime: UnwrapRef<typeof import('./utils/formatter/index')['formatRelativeTime']>
+    readonly formatTime: UnwrapRef<typeof import('./utils/formatter/index')['formatTime']>
+    readonly generateId: UnwrapRef<typeof import('./utils/tools/index')['generateId']>
+    readonly generateUUID: UnwrapRef<typeof import('./utils/tools/index')['generateUUID']>
     readonly getActivePinia: UnwrapRef<typeof import('pinia')['getActivePinia']>
+    readonly getClipboardData: UnwrapRef<typeof import('./utils/platform/index')['getClipboardData']>
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentPath: UnwrapRef<typeof import('./utils/index')['getCurrentPath']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
+    readonly getNavBarHeight: UnwrapRef<typeof import('./utils/platform/index')['getNavBarHeight']>
+    readonly getPlatform: UnwrapRef<typeof import('./utils/platform/index')['getPlatform']>
+    readonly getStatusBarHeight: UnwrapRef<typeof import('./utils/platform/index')['getStatusBarHeight']>
+    readonly getStorageInfoSync: UnwrapRef<typeof import('./utils/storage/index')['getStorageInfoSync']>
+    readonly getStorageSync: UnwrapRef<typeof import('./utils/storage/index')['getStorageSync']>
+    readonly getStorageWithExpire: UnwrapRef<typeof import('./utils/storage/index')['getStorageWithExpire']>
+    readonly getSystemInfo: UnwrapRef<typeof import('./utils/platform/index')['getSystemInfo']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
     readonly ignorableWatch: UnwrapRef<typeof import('@vueuse/core')['ignorableWatch']>
     readonly inject: UnwrapRef<typeof import('vue')['inject']>
     readonly injectLocal: UnwrapRef<typeof import('@vueuse/core')['injectLocal']>
+    readonly isApp: UnwrapRef<typeof import('./utils/platform/index')['isApp']>
     readonly isDefined: UnwrapRef<typeof import('@vueuse/core')['isDefined']>
+    readonly isEmpty: UnwrapRef<typeof import('./utils/tools/index')['isEmpty']>
+    readonly isH5: UnwrapRef<typeof import('./utils/platform/index')['isH5']>
     readonly isProxy: UnwrapRef<typeof import('vue')['isProxy']>
     readonly isReactive: UnwrapRef<typeof import('vue')['isReactive']>
     readonly isReadonly: UnwrapRef<typeof import('vue')['isReadonly']>
     readonly isRef: UnwrapRef<typeof import('vue')['isRef']>
+    readonly isWeixin: UnwrapRef<typeof import('./utils/platform/index')['isWeixin']>
     readonly makeDestructurable: UnwrapRef<typeof import('@vueuse/core')['makeDestructurable']>
     readonly mapActions: UnwrapRef<typeof import('pinia')['mapActions']>
     readonly mapGetters: UnwrapRef<typeof import('pinia')['mapGetters']>
@@ -414,6 +501,9 @@ declare module 'vue' {
     readonly mapStores: UnwrapRef<typeof import('pinia')['mapStores']>
     readonly mapWritableState: UnwrapRef<typeof import('pinia')['mapWritableState']>
     readonly markRaw: UnwrapRef<typeof import('vue')['markRaw']>
+    readonly maskIdCard: UnwrapRef<typeof import('./utils/formatter/index')['maskIdCard']>
+    readonly maskName: UnwrapRef<typeof import('./utils/formatter/index')['maskName']>
+    readonly maskPhone: UnwrapRef<typeof import('./utils/formatter/index')['maskPhone']>
     readonly mountApis: UnwrapRef<typeof import('./api/createApis')['mountApis']>
     readonly nextTick: UnwrapRef<typeof import('vue')['nextTick']>
     readonly onActivated: UnwrapRef<typeof import('vue')['onActivated']>
@@ -461,6 +551,8 @@ declare module 'vue' {
     readonly persistPlugin: UnwrapRef<typeof import('./store/persist')['persistPlugin']>
     readonly provide: UnwrapRef<typeof import('vue')['provide']>
     readonly provideLocal: UnwrapRef<typeof import('@vueuse/core')['provideLocal']>
+    readonly randomInt: UnwrapRef<typeof import('./utils/tools/index')['randomInt']>
+    readonly randomPick: UnwrapRef<typeof import('./utils/tools/index')['randomPick']>
     readonly reactify: UnwrapRef<typeof import('@vueuse/core')['reactify']>
     readonly reactifyObject: UnwrapRef<typeof import('@vueuse/core')['reactifyObject']>
     readonly reactive: UnwrapRef<typeof import('vue')['reactive']>
@@ -474,19 +566,27 @@ declare module 'vue' {
     readonly refDefault: UnwrapRef<typeof import('@vueuse/core')['refDefault']>
     readonly refThrottled: UnwrapRef<typeof import('@vueuse/core')['refThrottled']>
     readonly refWithControl: UnwrapRef<typeof import('@vueuse/core')['refWithControl']>
+    readonly removeStorageSync: UnwrapRef<typeof import('./utils/storage/index')['removeStorageSync']>
     readonly resolveComponent: UnwrapRef<typeof import('vue')['resolveComponent']>
     readonly resolveRef: UnwrapRef<typeof import('@vueuse/core')['resolveRef']>
     readonly resolveUnref: UnwrapRef<typeof import('@vueuse/core')['resolveUnref']>
     readonly setActivePinia: UnwrapRef<typeof import('pinia')['setActivePinia']>
+    readonly setClipboardData: UnwrapRef<typeof import('./utils/platform/index')['setClipboardData']>
     readonly setMapStoreSuffix: UnwrapRef<typeof import('pinia')['setMapStoreSuffix']>
+    readonly setStorageSync: UnwrapRef<typeof import('./utils/storage/index')['setStorageSync']>
+    readonly setStorageWithExpire: UnwrapRef<typeof import('./utils/storage/index')['setStorageWithExpire']>
     readonly shallowReactive: UnwrapRef<typeof import('vue')['shallowReactive']>
     readonly shallowReadonly: UnwrapRef<typeof import('vue')['shallowReadonly']>
     readonly shallowRef: UnwrapRef<typeof import('vue')['shallowRef']>
+    readonly shuffleArray: UnwrapRef<typeof import('./utils/tools/index')['shuffleArray']>
+    readonly simpleHash: UnwrapRef<typeof import('./utils/tools/index')['simpleHash']>
+    readonly sleep: UnwrapRef<typeof import('./utils/tools/index')['sleep']>
     readonly storeToRefs: UnwrapRef<typeof import('pinia')['storeToRefs']>
     readonly syncRef: UnwrapRef<typeof import('@vueuse/core')['syncRef']>
     readonly syncRefs: UnwrapRef<typeof import('@vueuse/core')['syncRefs']>
     readonly templateRef: UnwrapRef<typeof import('@vueuse/core')['templateRef']>
     readonly themeColorOptions: UnwrapRef<typeof import('./composables/useManualTheme')['themeColorOptions']>
+    readonly throttle: UnwrapRef<typeof import('./utils/tools/index')['throttle']>
     readonly throttledRef: UnwrapRef<typeof import('@vueuse/core')['throttledRef']>
     readonly throttledWatch: UnwrapRef<typeof import('@vueuse/core')['throttledWatch']>
     readonly toRaw: UnwrapRef<typeof import('vue')['toRaw']>
@@ -495,11 +595,15 @@ declare module 'vue' {
     readonly toRefs: UnwrapRef<typeof import('vue')['toRefs']>
     readonly toValue: UnwrapRef<typeof import('vue')['toValue']>
     readonly triggerRef: UnwrapRef<typeof import('vue')['triggerRef']>
+    readonly trim: UnwrapRef<typeof import('./utils/formatter/index')['trim']>
+    readonly truncate: UnwrapRef<typeof import('./utils/formatter/index')['truncate']>
     readonly tryOnBeforeMount: UnwrapRef<typeof import('@vueuse/core')['tryOnBeforeMount']>
     readonly tryOnBeforeUnmount: UnwrapRef<typeof import('@vueuse/core')['tryOnBeforeUnmount']>
     readonly tryOnMounted: UnwrapRef<typeof import('@vueuse/core')['tryOnMounted']>
     readonly tryOnScopeDispose: UnwrapRef<typeof import('@vueuse/core')['tryOnScopeDispose']>
     readonly tryOnUnmounted: UnwrapRef<typeof import('@vueuse/core')['tryOnUnmounted']>
+    readonly uniqueArray: UnwrapRef<typeof import('./utils/tools/index')['uniqueArray']>
+    readonly uniqueArrayByKey: UnwrapRef<typeof import('./utils/tools/index')['uniqueArrayByKey']>
     readonly unref: UnwrapRef<typeof import('vue')['unref']>
     readonly unrefElement: UnwrapRef<typeof import('@vueuse/core')['unrefElement']>
     readonly until: UnwrapRef<typeof import('@vueuse/core')['until']>
@@ -677,6 +781,18 @@ declare module 'vue' {
     readonly useWindowFocus: UnwrapRef<typeof import('@vueuse/core')['useWindowFocus']>
     readonly useWindowScroll: UnwrapRef<typeof import('@vueuse/core')['useWindowScroll']>
     readonly useWindowSize: UnwrapRef<typeof import('@vueuse/core')['useWindowSize']>
+    readonly validateAmount: UnwrapRef<typeof import('./utils/validator/index')['validateAmount']>
+    readonly validateBankCard: UnwrapRef<typeof import('./utils/validator/index')['validateBankCard']>
+    readonly validateChineseName: UnwrapRef<typeof import('./utils/validator/index')['validateChineseName']>
+    readonly validateEmail: UnwrapRef<typeof import('./utils/validator/index')['validateEmail']>
+    readonly validateIdCard: UnwrapRef<typeof import('./utils/validator/index')['validateIdCard']>
+    readonly validateNumber: UnwrapRef<typeof import('./utils/validator/index')['validateNumber']>
+    readonly validatePassword: UnwrapRef<typeof import('./utils/validator/index')['validatePassword']>
+    readonly validatePhone: UnwrapRef<typeof import('./utils/validator/index')['validatePhone']>
+    readonly validatePlateNumber: UnwrapRef<typeof import('./utils/validator/index')['validatePlateNumber']>
+    readonly validatePositiveInt: UnwrapRef<typeof import('./utils/validator/index')['validatePositiveInt']>
+    readonly validatePostalCode: UnwrapRef<typeof import('./utils/validator/index')['validatePostalCode']>
+    readonly validateUrl: UnwrapRef<typeof import('./utils/validator/index')['validateUrl']>
     readonly watch: UnwrapRef<typeof import('vue')['watch']>
     readonly watchArray: UnwrapRef<typeof import('@vueuse/core')['watchArray']>
     readonly watchAtMost: UnwrapRef<typeof import('@vueuse/core')['watchAtMost']>
