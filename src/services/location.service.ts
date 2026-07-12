@@ -11,6 +11,7 @@
  */
 
 import type { LocationOptions, LocationResult, ReverseGeocodeOptions, ReverseGeocodeResult } from './types'
+import { getStorageSync, removeStorageSync, setStorageSync } from '@/utils/storage'
 import { LocationError, LocationErrorCode } from './types'
 
 /** 默认配置 */
@@ -20,16 +21,16 @@ const DEFAULT_OPTIONS: Required<LocationOptions> = {
   useCache: true,
 }
 
-/** 缓存条目 */
+/** 定位缓存存储 key */
+const LOCATION_CACHE_KEY = 'location_cache'
+
+/** 缓存条目（持久化结构） */
 interface CacheEntry {
-  data: LocationResult
-  timestamp: number
+  value: LocationResult
+  expire: number
 }
 
 class LocationService {
-  /** 内存缓存 */
-  private cache: CacheEntry | null = null
-
   /** 当前 pending 的定位请求（防重复调用） */
   private pendingRequest: Promise<LocationResult> | null = null
 
@@ -41,8 +42,10 @@ class LocationService {
     const opts = { ...DEFAULT_OPTIONS, ...options }
 
     // 检查缓存有效性
-    if (opts.useCache && this.isCacheValid(opts.cacheTTL)) {
-      return { ...this.cache!.data }
+    if (opts.useCache) {
+      const entry = getStorageSync<CacheEntry>(LOCATION_CACHE_KEY)
+      if (entry?.value && Date.now() < entry.expire)
+        return { ...entry.value }
     }
 
     // 防重复：若已有 pending 请求，复用
@@ -66,16 +69,17 @@ class LocationService {
    * 用于定位失败时的兜底
    */
   getLastKnownLocation(): LocationResult | null {
-    if (!this.cache)
+    const entry = getStorageSync<CacheEntry>(LOCATION_CACHE_KEY)
+    if (!entry?.value)
       return null
-    return { ...this.cache.data, stale: true }
+    return { ...entry.value, stale: true }
   }
 
   /**
    * 清除缓存
    */
   clearCache() {
-    this.cache = null
+    removeStorageSync(LOCATION_CACHE_KEY)
   }
 
   /**
@@ -226,20 +230,10 @@ class LocationService {
    * 建议在页面 onUnload 时调用
    */
   destroy() {
-    this.cache = null
     this.pendingRequest = null
   }
 
   // ==================== 私有方法 ====================
-
-  /**
-   * 检查缓存是否在有效期内
-   */
-  private isCacheValid(ttl: number): boolean {
-    if (!this.cache)
-      return false
-    return Date.now() - this.cache.timestamp < ttl
-  }
 
   /**
    * 调用底层 API 获取定位，带超时控制
@@ -254,10 +248,10 @@ class LocationService {
 
       // 标准化结果并缓存
       const normalized = this.normalizeResult(result)
-      this.cache = {
-        data: normalized,
-        timestamp: Date.now(),
-      }
+      setStorageSync(LOCATION_CACHE_KEY, {
+        value: normalized,
+        expire: Date.now() + opts.cacheTTL,
+      } satisfies CacheEntry)
 
       return normalized
     }
@@ -265,9 +259,10 @@ class LocationService {
       // 如果是超时错误，直接抛出
       if (error instanceof LocationError) {
         // 尝试返回兜底缓存
-        if (this.cache) {
+        const entry = getStorageSync<CacheEntry>(LOCATION_CACHE_KEY)
+        if (entry?.value) {
           console.warn('[LocationService] 定位失败，返回过期缓存作为兜底')
-          return { ...this.cache.data, stale: true }
+          return { ...entry.value, stale: true }
         }
         throw error
       }
@@ -281,9 +276,10 @@ class LocationService {
       }
 
       // 其他错误尝试兜底
-      if (this.cache) {
+      const entry = getStorageSync<CacheEntry>(LOCATION_CACHE_KEY)
+      if (entry?.value) {
         console.warn('[LocationService] 定位失败，返回过期缓存作为兜底')
-        return { ...this.cache.data, stale: true }
+        return { ...entry.value, stale: true }
       }
 
       throw locationError
