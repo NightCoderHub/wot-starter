@@ -30,6 +30,11 @@ export default defineUniPages({
     // 动画配置
     animationType: 'pop-in',
     animationDuration: 300,
+
+    // H5 平台专属配置
+    h5: {
+      maxWidth: 750,
+    },
   },
   tabBar: {
     custom: true,

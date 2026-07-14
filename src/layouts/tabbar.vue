@@ -36,7 +36,7 @@ export default {
   <slot />
   <wd-gap safe-area-bottom height="var(--wot-tabbar-height, 50px)" />
   <wd-tabbar
-    :model-value="activeTabbar.name" bordered safe-area-inset-bottom fixed
+    :model-value="activeTabbar.name" bordered safe-area-inset-bottom fixed custom-class="h5-tabbar"
     @change="handleTabbarChange"
   >
     <wd-tabbar-item
@@ -45,3 +45,12 @@ export default {
     />
   </wd-tabbar>
 </template>
+
+<style scoped lang="scss">
+/* #ifdef H5 */
+:deep(.h5-tabbar) {
+  left: var(--window-left) !important;
+  right: var(--window-right) !important;
+}
+/* #endif */
+</style>
