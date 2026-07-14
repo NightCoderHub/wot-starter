@@ -31,7 +31,18 @@
       "style": {
         "navigationBarTitleText": "关于"
       }
+    },
+    // #ifdef H5
+    {
+      "path": "pages/location/index",
+      "type": "page",
+      "name": "location-test",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "定位服务测试"
+      }
     }
+    // #endif
   ],
   "subPackages": [
     {
