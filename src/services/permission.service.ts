@@ -52,6 +52,18 @@ class PermissionService {
   async checkPermission(scope: PermissionScope): Promise<PermissionStatus> {
     const cached = this.statusMap.get(scope)
     if (cached && cached !== 'unasked') {
+      // #ifdef H5
+      // H5 端：用户可能在浏览器设置中手动开启了权限
+      // 即使缓存为 denied，也要重新探测实际状态
+      if (cached === 'denied') {
+        const realStatus = await this.h5RecheckPermission(scope)
+        if (realStatus !== 'denied') {
+          this.statusMap.set(scope, realStatus)
+          return realStatus
+        }
+        return 'denied'
+      }
+      // #endif
       return cached
     }
 
@@ -70,6 +82,19 @@ class PermissionService {
     if (this.statusMap.get(scope) === 'granted') {
       return 'granted'
     }
+
+    // #ifdef H5
+    // H5 端：缓存为 denied 时不直接拦截，先重新探测
+    // 用户可能已在浏览器设置中手动开启权限
+    if (this.statusMap.get(scope) === 'denied') {
+      const realStatus = await this.h5RecheckPermission(scope)
+      if (realStatus === 'granted') {
+        this.statusMap.set(scope, 'granted')
+        return 'granted'
+      }
+      // 仍然是 denied，继续走后续流程（引导用户去设置）
+    }
+    // #endif
 
     // 幂等防抖：若已有 pending 请求，复用
     const pending = this.pendingRequests.get(scope)
@@ -122,7 +147,8 @@ class PermissionService {
       // #endif
 
       // #ifdef H5
-      resolve(false)
+      // H5 端无法通过代码打开浏览器设置页，引导用户手动操作
+      this.guideH5UserToSettings(resolve)
       // #endif
     })
   }
@@ -210,8 +236,8 @@ class PermissionService {
       // #endif
 
       // #ifdef H5
-      // H5 端权限由浏览器管理，简化处理
-      resolve('unasked')
+      // H5 端优先使用 Permissions API 静默查询，不支持则返回 unasked
+      this.queryH5PermissionStatus(scope, resolve)
       // #endif
     })
   }
@@ -258,9 +284,8 @@ class PermissionService {
       // #endif
 
       // #ifdef H5
-      // H5 端无法通过 uni API 请求权限，标记为 granted（由浏览器控制）
-      this.statusMap.set(scope, 'granted')
-      resolve('granted')
+      // H5 端通过实际调用浏览器能力来触发权限请求
+      this.requestH5Permission(scope, resolve)
       // #endif
     })
   }
@@ -479,6 +504,198 @@ class PermissionService {
       console.error('[PermissionService] 跳转设置页失败', e)
       resolve(false)
     }
+    // #endif
+  }
+
+  /**
+   * H5 端重新探测权限实际状态（绕过缓存）
+   * 优先使用 Permissions API，不可用时尝试 Geolocation API 静默探测
+   * 用于解决用户手动在浏览器设置中开启权限后，缓存仍为 denied 的问题
+   */
+  private async h5RecheckPermission(scope: PermissionScope): Promise<PermissionStatus> {
+    // #ifdef H5
+    // 策略 1：通过 Permissions API 静默查询
+    const h5PermissionNameMap: Record<PermissionScope, PermissionName | null> = {
+      location: 'geolocation',
+      camera: 'camera' as PermissionName,
+      album: null,
+      userInfo: null,
+    }
+    const permName = h5PermissionNameMap[scope]
+
+    if (permName && navigator.permissions?.query) {
+      try {
+        const result = await navigator.permissions.query({ name: permName })
+        const statusMap: Record<string, PermissionStatus> = {
+          granted: 'granted',
+          denied: 'denied',
+          prompt: 'unasked',
+        }
+        const status = statusMap[result.state] ?? 'unasked'
+        if (status !== 'unasked') {
+          return status
+        }
+      }
+      catch {
+        // Permissions API 查询失败，继续尝试策略 2
+      }
+    }
+
+    // 策略 2：对于 location，通过 Geolocation API 快速探测
+    // 使用极短超时，如果已授权则会很快返回成功
+    if (scope === 'location' && navigator.geolocation) {
+      return new Promise<PermissionStatus>((resolve) => {
+        navigator.geolocation.getCurrentPosition(
+          () => resolve('granted'),
+          (error) => {
+            if (error.code === error.PERMISSION_DENIED) {
+              resolve('denied')
+            }
+            else {
+              // TIMEOUT / POSITION_UNAVAILABLE 说明权限已授权（只是获取失败）
+              resolve('granted')
+            }
+          },
+          { timeout: 3000, enableHighAccuracy: false },
+        )
+      })
+    }
+
+    // 无法探测，保持原状态
+    return 'denied'
+    // #endif
+    return 'denied'
+  }
+
+  /**
+   * H5 端静默查询权限状态（通过 Permissions API）
+   * 注意：Permissions API 兼容性有限，Safari 不支持
+   */
+  private queryH5PermissionStatus(
+    scope: PermissionScope,
+    resolve: (status: PermissionStatus) => void,
+  ) {
+    // #ifdef H5
+    // Permissions API 仅支持部分权限名称映射
+    const h5PermissionNameMap: Record<PermissionScope, PermissionName | null> = {
+      location: 'geolocation',
+      camera: 'camera' as PermissionName,
+      album: null, // 浏览器无对应权限名
+      userInfo: null,
+    }
+
+    const permName = h5PermissionNameMap[scope]
+
+    // 无对应 Permissions API 名称，返回 unasked
+    if (!permName || !navigator.permissions?.query) {
+      resolve('unasked')
+      return
+    }
+
+    navigator.permissions.query({ name: permName }).then((result) => {
+      const statusMap: Record<string, PermissionStatus> = {
+        granted: 'granted',
+        denied: 'denied',
+        prompt: 'unasked',
+      }
+      resolve(statusMap[result.state] ?? 'unasked')
+    }).catch(() => {
+      // Permissions API 查询失败，回退为 unasked
+      resolve('unasked')
+    })
+    // #endif
+  }
+
+  /**
+   * H5 端请求权限（通过实际调用浏览器能力触发授权弹窗）
+   * - location: 通过 Geolocation API 尝试获取定位来判断
+   * - camera: 通过 getUserMedia 尝试获取摄像头来判断
+   * - 其他: 标记为 granted（由浏览器在后续调用时控制）
+   */
+  private requestH5Permission(
+    scope: PermissionScope,
+    resolve: (status: PermissionStatus) => void,
+  ) {
+    // #ifdef H5
+    if (scope === 'location') {
+      if (!navigator.geolocation) {
+        console.error('[PermissionService] 该浏览器不支持定位功能')
+        this.statusMap.set(scope, 'denied')
+        resolve('denied')
+        return
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          this.statusMap.set(scope, 'granted')
+          resolve('granted')
+        },
+        (error) => {
+          if (error.code === error.PERMISSION_DENIED) {
+            this.statusMap.set(scope, 'denied')
+            this.recordDeny(scope)
+            resolve('denied')
+          }
+          else {
+            // POSITION_UNAVAILABLE / TIMEOUT 不代表用户拒绝，标记为 granted
+            // 让后续定位调用自行处理这些错误
+            this.statusMap.set(scope, 'granted')
+            resolve('granted')
+          }
+        },
+        { timeout: 5000, enableHighAccuracy: true },
+      )
+      return
+    }
+
+    if (scope === 'camera') {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        console.error('[PermissionService] 该浏览器不支持摄像头功能')
+        this.statusMap.set(scope, 'denied')
+        resolve('denied')
+        return
+      }
+
+      navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+        // 获取成功后立即停止所有轨道，释放摄像头
+        stream.getTracks().forEach(track => track.stop())
+        this.statusMap.set(scope, 'granted')
+        resolve('granted')
+      }).catch((error) => {
+        if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+          this.statusMap.set(scope, 'denied')
+          this.recordDeny(scope)
+          resolve('denied')
+        }
+        else {
+          // 其他错误（设备不可用等）不代表用户拒绝
+          this.statusMap.set(scope, 'granted')
+          resolve('granted')
+        }
+      })
+      return
+    }
+
+    // album / userInfo 等无需浏览器权限弹窗
+    this.statusMap.set(scope, 'granted')
+    resolve('granted')
+    // #endif
+  }
+
+  /**
+   * H5 端引导用户手动进入浏览器设置页开启权限
+   * 浏览器安全机制限制，无法通过代码直接打开设置页
+   */
+  private guideH5UserToSettings(resolve: (result: boolean) => void) {
+    // #ifdef H5
+    const toast = useGlobalToast()
+    toast.show({
+      msg: '请在浏览器地址栏左侧点击锁图标，手动开启相关权限',
+      duration: 4000,
+    })
+    // 清除缓存，下次重新检测
+    this.statusMap.clear()
+    resolve(false)
     // #endif
   }
 

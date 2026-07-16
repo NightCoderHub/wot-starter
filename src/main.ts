@@ -1,11 +1,11 @@
 // #ifdef H5
 import VConsole from 'vconsole'
+// #endif
 import { createSSRApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 
 import 'uno.css'
-// #endif
 
 const pinia = createPinia()
 pinia.use(persistPlugin)

@@ -20,9 +20,50 @@ const logs = ref<string[]>([])
 const locationResult = ref<LocationResult | null>(null)
 const reverseResult = ref<ReverseGeocodeResult | null>(null)
 
+// 地图状态
+const mapCenter = ref({
+  latitude: 39.908823,
+  longitude: 116.397470,
+})
+const mapScale = ref(14)
+const markers = ref<any[]>([])
+const showLocation = ref(false)
+const mapContext = ref<UniApp.MapContext | null>(null)
+
+onMounted(() => {
+  mapContext.value = uni.createMapContext('locationMap')
+})
+
 function addLog(msg: string) {
   const time = new Date().toLocaleTimeString()
   logs.value.unshift(`[${time}] ${msg}`)
+}
+
+/** 更新地图中心和标记点 */
+function updateMap(result: LocationResult) {
+  mapCenter.value = {
+    latitude: result.latitude,
+    longitude: result.longitude,
+  }
+  markers.value = [{
+    id: 1,
+    latitude: result.latitude,
+    longitude: result.longitude,
+    title: reverseResult.value?.recommend || reverseResult.value?.address || '当前位置',
+    callout: {
+      content: reverseResult.value?.recommend || reverseResult.value?.address || `${result.latitude.toFixed(4)}, ${result.longitude.toFixed(4)}`,
+      display: 'ALWAYS',
+      fontSize: 13,
+      borderRadius: 6,
+      padding: 8,
+      bgColor: '#ffffff',
+      color: '#333333',
+    },
+    iconPath: '',
+    width: 30,
+    height: 30,
+  }]
+  showLocation.value = true
 }
 
 // 检查权限
@@ -61,6 +102,7 @@ async function getLocation() {
   try {
     const result = await locService.getCurrentLocation()
     locationResult.value = result
+    updateMap(result)
     addLog(`定位成功: ${result.latitude.toFixed(6)}, ${result.longitude.toFixed(6)}${result.stale ? ' (缓存兜底)' : ''}`)
   }
   catch (e: any) {
@@ -76,6 +118,10 @@ function getLastKnown() {
   const last = locService.getLastKnownLocation()
   if (last) {
     addLog(`最后已知位置: ${last.latitude.toFixed(6)}, ${last.longitude.toFixed(6)}${last.stale ? ' (已过期)' : ''}`)
+    mapCenter.value = {
+      latitude: last.latitude,
+      longitude: last.longitude,
+    }
   }
   else {
     addLog('暂无已知位置')
@@ -95,6 +141,8 @@ async function reverseGeocode() {
       locationResult.value.longitude,
     )
     reverseResult.value = result
+    // 更新地图标记点的气泡文案
+    updateMap(locationResult.value)
     addLog(`逆地址解析: ${result.address}`)
     if (result.recommend) {
       addLog(`推荐地址: ${result.recommend}`)
@@ -127,6 +175,20 @@ async function getCurrentAddress() {
   }
 }
 
+// 地图移回当前位置
+function moveToLocation() {
+  if (!locationResult.value) {
+    addLog('暂无定位数据')
+    return
+  }
+  mapContext.value?.moveToLocation({
+    latitude: locationResult.value.latitude,
+    longitude: locationResult.value.longitude,
+    success: () => addLog('地图已移回当前位置'),
+    fail: (err: any) => addLog(`移动地图失败: ${err.errMsg || err}`),
+  })
+}
+
 // 检查系统定位服务
 function checkSystemLocation() {
   const enabled = permService.checkSystemEnableLocation?.() ?? true
@@ -138,6 +200,8 @@ function clearCache() {
   locService.clearCache()
   locationResult.value = null
   reverseResult.value = null
+  markers.value = []
+  showLocation.value = false
   addLog('缓存已清除')
 }
 
@@ -155,6 +219,28 @@ onUnload(() => {
 
 <template>
   <view class="min-h-screen bg-gray-50 p-4 dark:bg-gray-900">
+    <!-- 地图区域 -->
+    <view class="mb-4 overflow-hidden rounded-3 bg-white dark:bg-gray-800">
+      <view class="flex items-center justify-between border-b border-gray-100 px-4 py-2 dark:border-gray-700">
+        <text class="text-4 font-bold">
+          地图
+        </text>
+        <wd-button size="small" plain :disabled="!locationResult" @click="moveToLocation">
+          回到当前位置
+        </wd-button>
+      </view>
+      <map
+        id="locationMap"
+        :latitude="mapCenter.latitude"
+        :longitude="mapCenter.longitude"
+        :scale="mapScale"
+        :markers="markers"
+        :show-location="showLocation"
+        class="w-full"
+        style="height: 300px;"
+      />
+    </view>
+
     <!-- 操作区 -->
     <view class="mb-4 rounded-3 bg-white p-4 dark:bg-gray-800">
       <text class="mb-3 block text-4 font-bold">

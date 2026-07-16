@@ -64,13 +64,23 @@ export default defineManifestConfig({
     optimization: {
       subPackages: true,
     },
-    appid: '',
+    appid: 'wxbb460691dad25f65',
     setting: {
       urlCheck: false,
     },
     usingComponents: true,
     darkmode: true,
     themeLocation: 'theme.json',
+    permission: {
+      'scope.userLocation': {
+        desc: '用于获取您的当前位置，提供定位及附近信息服务',
+      },
+    },
+    requiredPrivateInfos: [
+      'getLocation',
+      'onLocationChange',
+      'chooseLocation',
+    ],
   },
   'app-harmony': {},
   'mp-harmony': {},
@@ -90,6 +100,13 @@ export default defineManifestConfig({
   'h5': {
     darkmode: true,
     themeLocation: 'theme.json',
+    sdkConfigs: {
+      maps: {
+        qqmap: {
+          key: 'SQBBZ-C5SC7-WJEXL-PEQHL-WL2IE-IQBPA',
+        },
+      },
+    },
   },
   'uniStatistics': {
     enable: false,

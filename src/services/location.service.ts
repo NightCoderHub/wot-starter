@@ -102,16 +102,16 @@ class LocationService {
       )
     }
 
-    // 构建请求参数
-    const params = new URLSearchParams()
-    params.append('key', key)
-    params.append('location', `${latitude},${longitude}`)
-
+    // 构建请求参数（不使用 URLSearchParams，小程序环境不支持）
+    const data: Record<string, string | number> = {
+      key,
+      location: `${latitude},${longitude}`,
+    }
     if (options?.radius) {
-      params.append('radius', String(options.radius))
+      data.radius = options.radius
     }
     if (options?.getPoi) {
-      params.append('get_poi', '1')
+      data.get_poi = 1
       const poiOptions: string[] = []
       if (options.poiRadius) {
         poiOptions.push(`radius=${options.poiRadius}`)
@@ -120,20 +120,19 @@ class LocationService {
         poiOptions.push(`policy=${options.poiPolicy}`)
       }
       if (poiOptions.length > 0) {
-        params.append('poi_options', poiOptions.join(';'))
+        data.poi_options = poiOptions.join(';')
       }
     }
 
-    const url = `https://apis.map.qq.com/ws/geocoder/v1/?${params.toString()}`
-
     try {
       const response = await uni.request({
-        url,
+        url: 'https://apis.map.qq.com/ws/geocoder/v1/',
         method: 'GET',
+        data,
         dataType: 'json',
       })
 
-      const data = response.data as {
+      const resData = response.data as {
         status: number
         message: string
         result?: {
@@ -166,14 +165,14 @@ class LocationService {
         }
       }
 
-      if (data.status !== 0 || !data.result) {
+      if (resData.status !== 0 || !resData.result) {
         throw new LocationError(
           LocationErrorCode.UNAVAILABLE,
-          `逆地址解析失败: ${data.message || '未知错误'}`,
+          `逆地址解析失败: ${resData.message || '未知错误'}`,
         )
       }
 
-      const result = data.result
+      const result = resData.result
       return {
         address: result.address,
         recommend: result.formatted_addresses?.recommend,
