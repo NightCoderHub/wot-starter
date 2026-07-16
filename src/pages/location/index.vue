@@ -2,6 +2,7 @@
 import type { LocationResult, ReverseGeocodeResult } from '@/services/types'
 import { getLocationService } from '@/services/location.service'
 import { getPermissionService } from '@/services/permission.service'
+import { LocationErrorCode } from '@/services/types'
 
 definePage({
   name: 'location-test',
@@ -87,6 +88,9 @@ async function requestPermission() {
   try {
     const status = await permService.requestPermission('location')
     addLog(`请求权限结果: ${status}`)
+    if (status === 'denied') {
+      await permService.guideUserToSetting('location', '定位权限被拒绝，请在设置中开启位置权限')
+    }
   }
   catch (e: any) {
     addLog(`请求权限失败: ${e.message}`)
@@ -107,6 +111,9 @@ async function getLocation() {
   }
   catch (e: any) {
     addLog(`定位失败: [${e.code}] ${e.message}`)
+    if (e.code === LocationErrorCode.PERMISSION_DENIED) {
+      await permService.guideUserToSetting('location', '定位权限被拒绝，请在设置中开启位置权限后重试')
+    }
   }
   finally {
     loading.value = false

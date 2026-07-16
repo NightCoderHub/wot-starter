@@ -159,7 +159,6 @@ class PermissionService {
    */
   async guideUserToSetting(scope: PermissionScope, message = '需要您开启权限才能使用此功能'): Promise<boolean> {
     const dialog = useGlobalDialog()
-
     return new Promise((resolve) => {
       // 使用 success 回调处理用户点击
       dialog.confirm({
